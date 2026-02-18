@@ -3,15 +3,11 @@ import os
 import json
 import random
 
-# Получаем токен ТОЛЬКО из переменных окружения (НЕ из .env!)
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-
-if not BOT_TOKEN:
-    print("❌ ОШИБКА: Переменная BOT_TOKEN не найдена")
-    print("💡 Совет: Добавьте в Railway → Variables → Key: BOT_TOKEN, Value: ваш_токен")
-    exit(1)
-
-print(f"✅ Бот запущен с токеном: {BOT_TOKEN[:10]}...")
+import os
+print("🔍 Переменные окружения:")
+for k, v in os.environ.items():
+    if 'BOT' in k or 'TOKEN' in k:
+        print(f"  {k} = '{v}'")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
