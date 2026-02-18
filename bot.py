@@ -1,6 +1,3 @@
-cd /Users/annaendalova/Desktop/meal-planner-bot
-
-cat > bot.py << 'EOF'
 import telebot
 import os
 import json
