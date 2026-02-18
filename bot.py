@@ -6,7 +6,7 @@ import random
 from dotenv import load_dotenv
 
 # Загружаем токен из .env файла
-load_dotenv()
+
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 if not BOT_TOKEN:
