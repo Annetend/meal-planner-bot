@@ -6,10 +6,9 @@ import os
 import json
 import random
 
-# 🔑 Получаем токен из переменных окружения
+# Получаем токен из переменных окружения
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
-# 🚨 Проверка наличия токена
 if not BOT_TOKEN:
     print("❌ ОШИБКА: Переменная BOT_TOKEN не установлена")
     print("💡 Добавьте её в Railway → Variables → Key: BOT_TOKEN")
@@ -17,7 +16,6 @@ if not BOT_TOKEN:
 
 print(f"✅ Бот запущен с токеном: {BOT_TOKEN[:10]}...")
 
-# 🤖 Создаём бота
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Загружаем базы данных
@@ -46,8 +44,6 @@ def send_welcome(message):
         "Выберите действие:",
         reply_markup=main_menu
     )
-
-# ... остальной код без изменений ...
 
 @bot.message_handler(func=lambda message: message.text == "🍽️ Составить меню")
 def start_menu_planning(message):
