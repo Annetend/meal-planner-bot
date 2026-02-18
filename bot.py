@@ -1,14 +1,23 @@
+cd /Users/annaendalova/Desktop/meal-planner-bot
+
+cat > bot.py << 'EOF'
 import telebot
 import os
 import json
 import random
 
-import os
-print("🔍 Переменные окружения:")
-for k, v in os.environ.items():
-    if 'BOT' in k or 'TOKEN' in k:
-        print(f"  {k} = '{v}'")
+# 🔑 Получаем токен из переменных окружения
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
+# 🚨 Проверка наличия токена
+if not BOT_TOKEN:
+    print("❌ ОШИБКА: Переменная BOT_TOKEN не установлена")
+    print("💡 Добавьте её в Railway → Variables → Key: BOT_TOKEN")
+    exit(1)
+
+print(f"✅ Бот запущен с токеном: {BOT_TOKEN[:10]}...")
+
+# 🤖 Создаём бота
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Загружаем базы данных
@@ -430,3 +439,8 @@ if __name__ == "__main__":
     print("✅ Бот успешно запущен!")
     print("📱 Откройте Telegram и напишите /start")
     bot.infinity_polling()
+EOF
+
+git add bot.py
+git commit -m "Fix: define BOT_TOKEN from environment"
+git push origin main
