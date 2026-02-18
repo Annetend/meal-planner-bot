@@ -1,16 +1,13 @@
-
 import telebot
 import os
 import json
 import random
-from dotenv import load_dotenv
 
-# Загружаем токен из .env файла
-
+# Получаем токен из переменных окружения (работает и на сервере, и локально)
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 if not BOT_TOKEN:
-    raise ValueError("❌ Ошибка: не найден токен в файле .env")
+    raise ValueError("❌ Ошибка: не найден токен. Установите переменную окружения BOT_TOKEN")
 
 # Создаём бота
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -50,7 +47,6 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: message.text == "🍽️ Составить меню")
 def start_menu_planning(message):
-    # Кнопки выбора типа
     type_menu = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     type_menu.add("👤 Для себя")
     type_menu.add("👨‍👩‍👧‍👦 Для семьи")
@@ -72,7 +68,6 @@ def process_person_type(message):
     user_data[message.chat.id] = {'person_type': message.text}
     
     if message.text == "👤 Для себя":
-        # Выбор пола
         gender_menu = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         gender_menu.add("Мужчина 👨")
         gender_menu.add("Женщина 👩")
@@ -134,7 +129,6 @@ def process_budget_for_menu(message):
         
         user_data[message.chat.id]['budget'] = budget
         
-        # Выбор периода
         period_menu = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         period_menu.add("📅 На день")
         period_menu.add("📆 На неделю")
@@ -159,7 +153,6 @@ def process_period(message):
     
     user_data[message.chat.id]['period'] = message.text
     
-    # Выбор аллергенов
     allergen_menu = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     allergen_menu.add("Нет аллергий ✅")
     allergen_menu.add("Выбрать аллергены")
@@ -179,7 +172,6 @@ def process_allergens_choice(message):
     if message.text == "Нет аллергий ✅":
         generate_menu(message)
     else:
-        # Показываем кнопки аллергенов
         allergen_buttons = telebot.types.InlineKeyboardMarkup()
         for allergen in allergens_list:
             btn = telebot.types.InlineKeyboardButton(
@@ -196,7 +188,6 @@ def process_allergens_choice(message):
         
         bot.reply_to(message, "Выберите аллергены (нажмите на аллерген, чтобы добавить/убрать):", reply_markup=allergen_buttons)
 
-# Обработчик нажатий на аллергены
 @bot.callback_query_handler(func=lambda call: call.data.startswith('allergen_') or call.data == 'allergens_done')
 def callback_allergens(call):
     chat_id = call.message.chat.id
@@ -217,12 +208,9 @@ def callback_allergens(call):
     
     if allergen in user_data[chat_id]['allergens']:
         user_data[chat_id]['allergens'].remove(allergen)
-        status = "убран"
     else:
         user_data[chat_id]['allergens'].append(allergen)
-        status = "добавлен"
     
-    # Обновляем кнопки
     allergen_buttons = telebot.types.InlineKeyboardMarkup()
     for a in allergens_list:
         mark = "✅ " if a in user_data[chat_id]['allergens'] else ""
@@ -252,7 +240,6 @@ def generate_menu(message):
     budget = user['budget']
     allergens = user.get('allergens', [])
     
-    # Фильтруем рецепты по калориям, бюджету и аллергенам
     suitable_recipes = {
         'завтрак': [],
         'обед': [],
@@ -261,21 +248,17 @@ def generate_menu(message):
     }
     
     for recipe in recipes.values():
-        # Проверяем калории
         if recipe['calories'] > calories * 0.5 or recipe['calories'] < 200:
             continue
         
-        # Проверяем бюджет
-        if recipe['price'] > budget * 0.4:  # Ограничиваем стоимость одного приёма пищи
+        if recipe['price'] > budget * 0.4:
             continue
         
-        # Проверяем аллергены
         if any(a in allergens for a in recipe['allergens']):
             continue
         
         suitable_recipes[recipe['category']].append(recipe)
     
-    # Формируем меню на день
     menu = {}
     total_calories = 0
     total_cost = 0
@@ -288,7 +271,6 @@ def generate_menu(message):
         else:
             menu[category] = None
     
-    # Формируем сообщение
     period = user['period']
     
     if period == "📅 На день":
@@ -364,7 +346,6 @@ def generate_menu(message):
         
         bot.reply_to(message, result, parse_mode="Markdown", reply_markup=main_menu)
     
-    # Очищаем данные
     del user_data[chat_id]
 
 # =================== РАСЧЁТ ИМТ ===================
@@ -397,12 +378,10 @@ def process_height_step(message):
         chat_id = message.chat.id
         user_data[chat_id]['height'] = height
         
-        # Рассчитываем ИМТ
         weight = user_data[chat_id]['weight']
         height_m = height / 100
         bmi = weight / (height_m ** 2)
         
-        # Определяем категорию
         if bmi < 18.5:
             category = "Недостаточный вес"
             emoji = "⚠️"
@@ -535,7 +514,6 @@ def process_activity_step(message):
     chat_id = message.chat.id
     user = user_data[chat_id]
     
-    # Рассчитываем калории
     gender = user['gender']
     weight = user['weight']
     height = user['height']
@@ -592,4 +570,3 @@ if __name__ == "__main__":
     print("✅ Бот успешно запущен!")
     print("📱 Откройте Telegram и напишите /start")
     bot.infinity_polling()
-EOF
