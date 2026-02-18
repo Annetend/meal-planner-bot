@@ -437,6 +437,4 @@ if __name__ == "__main__":
     bot.infinity_polling()
 EOF
 
-git add bot.py
-git commit -m "Fix: define BOT_TOKEN from environment"
-git push origin main
+
